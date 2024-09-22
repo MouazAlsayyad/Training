@@ -8,6 +8,7 @@ out/
 *.vscode/
 *.user
 *.lock.json
+.vs/
 
 # Visual Studio Code specific files
 .vscode/
