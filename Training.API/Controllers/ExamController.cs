@@ -17,7 +17,7 @@ namespace Training.API.Controllers
         public async Task<ActionResult<CreateExamCommandResponse>> CreateExam([FromBody] CreateExamCommand createExamCommand)
         {
             var result = await _mediator.Send(createExamCommand);
-            return CreatedAtAction(nameof(GetExamById), new { examId = result.ExamId }, result); // Return 201 Created
+            return CreatedAtAction(nameof(GetExamById), new { examId = result.ExamId }, result);
         }
 
 
