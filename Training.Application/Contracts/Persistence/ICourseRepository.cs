@@ -2,7 +2,7 @@
 
 namespace Training.Application.Contracts.Persistence
 {
-    public interface IMaterialRepository : IAsyncRepository<Material>
+    public interface ICourseRepository : IAsyncRepository<Course>
     {
 
     }

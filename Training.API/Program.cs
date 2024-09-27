@@ -1,4 +1,4 @@
-using Training.API.Middleware;
+using Training.API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 

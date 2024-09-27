@@ -13,15 +13,15 @@ namespace Training.Domain.Entities
         public ICollection<Question> Questions { get; set; } = [];
 
         public TimeSpan Duration { get; set; } = TimeSpan.FromHours(1).Add(TimeSpan.FromMinutes(15));
-        
+
         [Required]
         public DateTime TimeOfExam { get; set; }
 
         [Required]
-        public Guid MaterialId { get; set; }
+        public Guid CourseId { get; set; }
 
-        // Navigation property for the many-to-one relationship with Material
-        [ForeignKey("MaterialId")]
-        public required Material Material { get; set; }
+        // Navigation property for the many-to-one relationship with Course
+        [ForeignKey("CourseId")]
+        public required Course Course { get; set; }
     }
 }

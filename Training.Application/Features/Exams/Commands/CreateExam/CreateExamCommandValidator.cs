@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Training.Application.Contracts.Persistence;
 using Training.Application.Helper.Validators;
 
 namespace Training.Application.Features.Exams.Commands.CreateExam
@@ -8,7 +7,7 @@ namespace Training.Application.Features.Exams.Commands.CreateExam
     {
         public CreateExamCommandValidator()
         {
-            RuleFor(p => p.MaterialId)
+            RuleFor(p => p.CourseId)
                 .NotEmpty().WithMessage("{PropertyName} is required.")
                 .NotNull().WithMessage("{PropertyName} cannot be null.")
                 .Must(guid => GuidValidator.BeAValidGuid(guid)).WithMessage("{PropertyName} must be a valid GUID.");

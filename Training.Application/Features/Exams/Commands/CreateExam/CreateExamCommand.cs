@@ -6,6 +6,6 @@ namespace Training.Application.Features.Exams.Commands.CreateExam
     {
         public TimeSpan Duration { get; set; }
         public DateTime TimeOfExam { get; set; }
-        public Guid MaterialId { get; set; }
+        public Guid CourseId { get; set; }
     }
 }

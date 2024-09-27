@@ -2,7 +2,7 @@
 using System.Text.Json;
 using Training.Application.Exceptions;
 
-namespace Training.API.Middleware
+namespace Training.API.Middlewares
 {
     public class ExceptionHandlingMiddleware(RequestDelegate next)
     {

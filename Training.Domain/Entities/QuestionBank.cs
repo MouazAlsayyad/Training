@@ -11,10 +11,10 @@ namespace Training.Domain.Entities
 
         public ICollection<Question> Questions { get; set; } = new List<Question>();
 
-        [ForeignKey("Material")]
-        public Guid MaterialId { get; set; }
+        [ForeignKey("Course")]
+        public Guid CourseId { get; set; }
 
         // Navigation property for the one-to-one relationship
-        public Material Material { get; set; } = null!;
+        public Course Course { get; set; } = null!;
     }
 }

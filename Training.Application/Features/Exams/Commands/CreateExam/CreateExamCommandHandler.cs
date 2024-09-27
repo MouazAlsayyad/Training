@@ -8,11 +8,11 @@ namespace Training.Application.Features.Exams.Commands.CreateExam
 {
     public class CreateExamCommandHandler(
         IExamRepository examRepository,
-        IMaterialRepository materialRepository,
+        ICourseRepository courseRepository,
         IMapper mapper) : IRequestHandler<CreateExamCommand, CreateExamCommandResponse>
     {
 
-        private readonly IMaterialRepository _materialRepository = materialRepository ?? throw new ArgumentNullException(nameof(materialRepository));
+        private readonly ICourseRepository _courselRepository = courseRepository ?? throw new ArgumentNullException(nameof(courseRepository));
         private readonly IExamRepository _examRepository = examRepository ?? throw new ArgumentNullException(nameof(examRepository));
         private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
@@ -27,10 +27,10 @@ namespace Training.Application.Features.Exams.Commands.CreateExam
             if (!validationResult.IsValid)
                 throw new ValidationException(validationResult);
 
-            var material = await _materialRepository.GetByIdAsync(request.MaterialId) ??
+            var course = await _courselRepository.GetByIdAsync(request.CourseId) ??
                 throw new NotFoundException(
-                    nameof(Material), request.MaterialId,
-                    $"Material with ID {request.MaterialId} was not found.");
+                    nameof(Course), request.CourseId,
+                    $"Course with ID {request.CourseId} was not found.");
 
             var @exam = _mapper.Map<Exam>(request);
             var newExam = await _examRepository.AddAsync(@exam, cancellationToken);
