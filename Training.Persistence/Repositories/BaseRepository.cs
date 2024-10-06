@@ -4,11 +4,29 @@ using Training.Application.Contracts.Persistence;
 
 namespace Training.Persistence.Repositories
 {
-    public class BaseRepository<T>(TrainingDbContext dbContext) : IAsyncRepository<T> where T : class
+    public class BaseRepository<T> : IAsyncRepository<T> where T : class
     {
-        protected readonly TrainingDbContext _dbContext = dbContext;
+        
+        protected readonly TrainingDbContext _dbContext;
+        protected readonly DbSet<T> _DbSet;
+
+        public BaseRepository(TrainingDbContext dbContext)
+        {
+            _dbContext = dbContext;
+            _DbSet = _dbContext.Set<T>();
+        }
 
         public virtual async Task<T?> GetByIdAsync(Guid id, CancellationToken? cancellationToken = null)
+        {
+            return await _dbContext.Set<T>()
+                .FindAsync([id], cancellationToken ?? CancellationToken.None);
+        }
+
+        public IQueryable<T> Where(Expression<Func<T, bool>> predicate)
+        {
+            return _DbSet.AsNoTracking().Where(predicate);
+        }
+        public virtual async Task<T?> GetByIdAsync(int id, CancellationToken? cancellationToken = null)
         {
             return await _dbContext.Set<T>()
                 .FindAsync([id], cancellationToken ?? CancellationToken.None);
