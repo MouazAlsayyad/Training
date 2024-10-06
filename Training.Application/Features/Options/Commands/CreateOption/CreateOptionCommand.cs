@@ -1,8 +1,9 @@
 ﻿using MediatR;
+using Training.Application.Responses;
 
 namespace Training.Application.Features.Options.Commands.CreateOption
 {
-    public class CreateOptionCommand : IRequest<CreateOptionCommandResponse>
+    public class CreateOptionCommand : IRequest<BaseResponse<Guid>>
     {
         public required string Text { get; set; }
 

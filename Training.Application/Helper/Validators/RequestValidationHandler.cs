@@ -5,10 +5,10 @@ namespace Training.Application.Helper.Validators
 {
     public static class RequestValidationHandler
     {
-        public static async Task<BaseResponse?> ValidateAsync<TRequest>(
+        public static async Task<BaseResponse<object>?> ValidateAsync<TRequest>(
             TRequest request,
             IValidator<TRequest> validator,
-            Func<BaseResponse> responseFactory,
+            Func<BaseResponse<object>> responseFactory,
             CancellationToken cancellationToken)
         {
             var validationResult = await validator.ValidateAsync(request, cancellationToken);

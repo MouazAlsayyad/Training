@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Azure;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Training.Application.Features.Questions.Commands.CreateQuestion;
 using Training.Application.Features.Questions.Commands.DeleteQuestion;
@@ -14,47 +15,69 @@ namespace Training.API.Controllers
     {
         private readonly IMediator _mediator = mediator;
 
-        [HttpGet("all", Name = "GetAllQuestions")]
+        [HttpGet("GetAllQuestions", Name = "GetAllQuestions")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<GetQuestionsListQueryResponse>> GetAllQuestions([FromQuery] GetQuestionsListQuery getQuestionsListQuery)
+        public async Task<ActionResult> GetAllQuestions([FromQuery] GetQuestionsListQuery getQuestionsListQuery)
         {
-            var result = await _mediator.Send(getQuestionsListQuery);
-            return Ok(result);
+            var response = await _mediator.Send(getQuestionsListQuery);
+
+            return response.StatusCode switch
+            {
+                200 => Ok(response),
+                404 => NotFound(response),
+                _ => BadRequest(response)
+            };
         }
 
         [HttpGet("{questionId:guid}", Name = "GetQuestionDetail")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<GetQuestionDetailQueryResponse>> GetQuestionDetail(Guid questionId)
+        public async Task<ActionResult> GetQuestionDetail(Guid questionId)
         {
-            var result = await _mediator.Send(
+            var response = await _mediator.Send(
                 new GetQuestionDetailQuery { QuestionId = questionId });
-            return Ok(result);
+
+            return response.StatusCode switch
+            {
+                200 => Ok(response),
+                404 => NotFound(response),
+                _ => BadRequest(response)
+            };
         }
 
         [HttpPost(Name = "CreateQuestion")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<CreateQuestionCommandResponse>> CreateQuestion([FromBody] CreateQuestionCommand createQuestionCommand)
+        public async Task<ActionResult> CreateQuestion([FromBody] CreateQuestionCommand createQuestionCommand)
         {
-            var result = await _mediator.Send(createQuestionCommand);
+            var response = await _mediator.Send(createQuestionCommand);
 
-            return CreatedAtAction(
-                nameof(GetQuestionDetail),
-                new { questionId = result.Question.QuestionId }, result);
+
+            return response.StatusCode switch
+            {
+                200 => Ok(response),
+                404 => NotFound(response),
+                _ => BadRequest(response)
+            };
         }
 
         [HttpPut(Name = "UpdateQuestion")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UpdateQuestionCommandResponse>> UpdateQuestion([FromBody] UpdateQuestionCommand updateQuestionCommand)
+        public async Task<ActionResult> UpdateQuestion([FromBody] UpdateQuestionCommand updateQuestionCommand)
         {
-            var result = await _mediator.Send(updateQuestionCommand);
-            return Ok(result);
+            var response = await _mediator.Send(updateQuestionCommand);
+
+            return response.StatusCode switch
+            {
+                200 => Ok(response),
+                404 => NotFound(response),
+                _ => BadRequest(response)
+            };
         }
 
 
@@ -64,9 +87,17 @@ namespace Training.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteQuestion(Guid questionId)
         {
-            await _mediator.Send(
-                new DeleteQuestionCommand { QuestionId = questionId });
-            return NoContent();
+           var response =  await _mediator.Send(new DeleteQuestionCommand()
+           { 
+               QuestionId = questionId 
+           });
+            
+            return response.StatusCode switch
+            {
+                200 => Ok(response),
+                404 => NotFound(response),
+                _ => BadRequest(response)
+            };
         }
     }
 }

@@ -1,9 +1,10 @@
 ﻿using MediatR;
+using Training.Application.Responses;
 using Training.Domain.Enums;
 
 namespace Training.Application.Features.Questions.Commands.UpdateQuestion
 {
-    public class UpdateQuestionCommand : IRequest<UpdateQuestionCommandResponse>
+    public class UpdateQuestionCommand : IRequest<BaseResponse<object>>
     {
         public required Guid QuestionId { get; set; }
         public string? Text { get; set; } = string.Empty;

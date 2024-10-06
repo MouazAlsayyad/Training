@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Azure;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Training.Application.Features.Options.Commands.CreateOption;
 using Training.Application.Features.Options.Commands.DeleteOption;
@@ -16,20 +17,32 @@ namespace Training.API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<CreateOptionCommandResponse>> CreateOption([FromBody] CreateOptionCommand createOptionCommand)
+        public async Task<ActionResult> CreateOption([FromBody] CreateOptionCommand createOptionCommand)
         {
-            await _mediator.Send(createOptionCommand);
-            return Ok();
+            var response =  await _mediator.Send(createOptionCommand);
+            
+            return response.StatusCode switch
+            {
+                200 => Ok(response),
+                404 => NotFound(response),
+                _ => BadRequest(response)
+            };
         }
 
         [HttpPut(Name = "UpdateOption")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UpdateOptionCommandResponse>> UpdateOption([FromBody] UpdateOptionCommand updateOptionCommand)
+        public async Task<ActionResult> UpdateOption([FromBody] UpdateOptionCommand updateOptionCommand)
         {
-            var result = await _mediator.Send(updateOptionCommand);
-            return Ok(result);
+            var response = await _mediator.Send(updateOptionCommand);
+
+            return response.StatusCode switch
+            {
+                200 => Ok(response),
+                404 => NotFound(response),
+                _ => BadRequest(response)
+            };
         }
 
         [HttpDelete("{optionId:guid}", Name = "DeleteOption")]
@@ -38,8 +51,14 @@ namespace Training.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteOption(Guid optionId)
         {
-            await _mediator.Send(new DeleteOptionCommand { OptionId = optionId });
-            return NoContent();
+            var response = await _mediator.Send(new DeleteOptionCommand { OptionId = optionId });
+
+            return response.StatusCode switch
+            {
+                200 => Ok(response),
+                404 => NotFound(response),
+                _ => BadRequest(response)
+            };
         }
 
     }

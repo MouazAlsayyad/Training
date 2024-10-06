@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Training.Application.Features.Exams.Commands.CreateExam;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Training.API.Controllers
 {
@@ -14,10 +15,16 @@ namespace Training.API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<CreateExamCommandResponse>> CreateExam([FromBody] CreateExamCommand createExamCommand)
+        public async Task<ActionResult> CreateExam([FromBody] CreateExamCommand createExamCommand)
         {
-            var result = await _mediator.Send(createExamCommand);
-            return CreatedAtAction(nameof(GetExamById), new { examId = result.ExamId }, result);
+            var response = await _mediator.Send(createExamCommand);
+           
+            return response.StatusCode switch
+            {
+                200 => Ok(response),
+                404 => NotFound(response),
+                _ => BadRequest(response)
+            };
         }
 
 

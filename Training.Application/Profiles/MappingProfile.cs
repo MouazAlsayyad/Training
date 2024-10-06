@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Training.Application.Features.Options.Commands.CreateOption;
 using Training.Application.Features.Options.Commands.UpdateOption;
+using Training.Application.Features.Options.Queries.GetOptionById;
 using Training.Application.Features.Questions.Commands.CreateQuestion;
 using Training.Application.Features.Questions.Commands.DeleteQuestion;
 using Training.Application.Features.Questions.Commands.UpdateQuestion;
@@ -24,14 +25,14 @@ namespace Training.Application.Profiles
             CreateMap<CreateQuestionCommand, Question>()
                 .ForMember(dest => dest.QuestionId, opt => opt.Ignore());
 
-            CreateMap<Question, CreateQuestionDto>().ReverseMap();
+            CreateMap<Question, CreateQuestionCommand>().ReverseMap();
 
             CreateMap<UpdateQuestionCommand, Question>()
                 .ForMember(dest => dest.QuestionId, opt => opt.Ignore()) 
                 .ForMember(dest => dest.CreatedDate, opt => opt.Ignore()) 
                 .ForMember(dest => dest.LastModifiedDate, opt => opt.MapFrom(src => DateTime.Now));
 
-            CreateMap<Question, UpdateQuestionDto>().ReverseMap();
+            CreateMap<Question, UpdateQuestionCommand>().ReverseMap();
 
             //---------------------------------- Option ----------------------------------
             CreateMap<CreateOptionCommand, Option>()

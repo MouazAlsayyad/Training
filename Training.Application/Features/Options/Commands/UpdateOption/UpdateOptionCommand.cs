@@ -1,8 +1,9 @@
 ﻿using MediatR;
+using Training.Application.Responses;
 
 namespace Training.Application.Features.Options.Commands.UpdateOption
 {
-    public class UpdateOptionCommand : IRequest<UpdateOptionCommandResponse>
+    public class UpdateOptionCommand : IRequest<BaseResponse<object>>
     {
         public  string? Text { get; set; }
 

@@ -2,7 +2,10 @@
 using MediatR;
 using Training.Application.Contracts.Persistence;
 using Training.Application.Exceptions;
+using Training.Application.Features.Exams.Commands.CreateExam;
+using Training.Application.Features.Questions.Commands.CreateQuestion;
 using Training.Application.Helper.Validators;
+using Training.Application.Responses;
 using Training.Domain.Entities;
 
 namespace Training.Application.Features.Options.Commands.CreateOption
@@ -10,65 +13,37 @@ namespace Training.Application.Features.Options.Commands.CreateOption
     public class CreateOptionCommandHandler(
         IQuestionRepository questionRepository,
         IOptionRepository optionRepository,
-        IMapper mapper) : IRequestHandler<CreateOptionCommand, CreateOptionCommandResponse>
+        IMapper mapper) : IRequestHandler<CreateOptionCommand, BaseResponse<Guid>>
     {
         private readonly IOptionRepository _optionRepository = optionRepository ?? throw new ArgumentNullException(nameof(optionRepository));
         private readonly IQuestionRepository _questionRepository = questionRepository ?? throw new ArgumentNullException(nameof(questionRepository));
         private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-        public async Task<CreateOptionCommandResponse> Handle(CreateOptionCommand request, CancellationToken cancellationToken)
+        public async Task<BaseResponse<Guid>> Handle(CreateOptionCommand request, CancellationToken cancellationToken)
         {
-
-            var createOptionCommandResponse = new CreateOptionCommandResponse();
-            var validationResponse = await RequestValidationHandler.ValidateAsync(
-                request,
-                new CreateOptionCommandValidator(),
-                () => createOptionCommandResponse,
-                cancellationToken
-            );
-
-            if (validationResponse is not null )
-                return (CreateOptionCommandResponse)validationResponse;
-
-
-
-            var question = await _questionRepository.GetByIdAsync(request.QuestionId, cancellationToken) ??
-                throw new NotFoundException(
-                    nameof(Question), request.QuestionId,
-                    $"Question with ID {request.QuestionId} was not found.");
-
-            var existingOptions = await _optionRepository
-                .ListAllAsync(o => o.QuestionId == request.QuestionId && o.Text == request.Text, cancellationToken);
-
-            if (existingOptions.Any())
+            var Question = await _questionRepository.GetByIdAsync(request.QuestionId);
+            
+            if (Question == null)
             {
-                createOptionCommandResponse.Success = false;
-                createOptionCommandResponse.Message = "An option with the same text already exists for this question.";
-                return createOptionCommandResponse;
+                return new BaseResponse<Guid>("Question Not Found", false, 400);
             }
 
-            if (request.IsCorrect.HasValue && request.IsCorrect.Value)
+            var validator = new CreateOptionCommandValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+            if (validationResult.Errors.Count() > 0)
             {
-                var correctOptionExists = await _optionRepository
-                    .ListAllAsync(
-                    o => o.QuestionId == request.QuestionId 
-                    && o.IsCorrect == true, cancellationToken);
-
-                if (!question.AllowsMultipleCorrectAnswers && correctOptionExists.Any())
-                {
-                    createOptionCommandResponse.Success = false;
-                    createOptionCommandResponse.Message = "The question already has a correct option.";
-                    return createOptionCommandResponse;
-                }
+                return new BaseResponse<Guid>("There is Validation Errors", false, 400, validationResult.Errors.Select(e => e.ErrorMessage).ToList());
             }
-            var option = _mapper.Map<Option>(request);
-            option = await _optionRepository.AddAsync(option, cancellationToken);
+            else
+            {
+                var Option = _mapper.Map<Option>(request);
 
-            createOptionCommandResponse.Success = true;
-            createOptionCommandResponse.Message = "Option created successfully.";
-            createOptionCommandResponse.Option = _mapper.Map<CreateOptionDto>(option);
+                var data = await _optionRepository.AddAsync(Option);
 
-            return createOptionCommandResponse;
+                return new BaseResponse<Guid>("", true, 200, data.OptionId);
+            }
+
         }
 
     }

@@ -21,4 +21,8 @@
     <ProjectReference Include="..\Training.Domain\Training.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\Courses\Queries\" />
+  </ItemGroup>
+
 </Project>

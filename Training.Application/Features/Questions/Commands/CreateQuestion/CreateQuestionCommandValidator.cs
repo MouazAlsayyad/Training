@@ -13,12 +13,12 @@ namespace Training.Application.Features.Questions.Commands.CreateQuestion
                 .MaximumLength(500).WithMessage("{PropertyName} must not exceed 500 characters.");
 
             RuleFor(q => q.Options)
-               .NotEmpty().WithMessage("Options are required.")
-               .Must(HaveAtLeastTwoOptions).WithMessage("At least two options are required.")
-               .Must(HaveAtLeastOneCorrectOption).WithMessage("At least one option must be correct.")
-               .Must(HaveUniqueOptionTexts).WithMessage("Option texts must be unique.")
-               .Must((command, options) => HaveValidCorrectOptions(command.AllowsMultipleCorrectAnswers, options))
-               .WithMessage("Only one correct option is allowed unless multiple correct answers are allowed.");
+               .NotEmpty().WithMessage("Options are required.");
+              //.Must(HaveAtLeastTwoOptions).WithMessage("At least two options are required.")
+               //.Must(HaveAtLeastOneCorrectOption).WithMessage("At least one option must be correct.")
+               //.Must(HaveUniqueOptionTexts).WithMessage("Option texts must be unique.")
+               //.Must((command, options) => HaveValidCorrectOptions(command.AllowsMultipleCorrectAnswers, options))
+               //.WithMessage("Only one correct option is allowed unless multiple correct answers are allowed.");
 
             RuleFor(q => q.Difficulty)
                 .IsInEnum().WithMessage("Invalid difficulty level.");

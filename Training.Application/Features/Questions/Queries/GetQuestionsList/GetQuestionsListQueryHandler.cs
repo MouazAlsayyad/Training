@@ -4,48 +4,38 @@ using Training.Application.Contracts.Persistence;
 using Training.Application.Exceptions;
 using Training.Application.Features.Questions.Commands.CreateQuestion;
 using Training.Application.Helper.Validators;
+using Training.Application.Responses;
 using Training.Domain.Entities;
 
 namespace Training.Application.Features.Questions.Queries.GetQuestionsList
 {
-    public class GetQuestionsListQueryHandler(IQuestionRepository questionRepository, IMapper mapper) : IRequestHandler<GetQuestionsListQuery, GetQuestionsListQueryResponse>
+    public class GetQuestionsListQueryHandler(IQuestionRepository questionRepository, IMapper mapper) 
+        : IRequestHandler<GetQuestionsListQuery, BaseResponse<List<QuestionListVm>>>
     {
         private readonly IQuestionRepository _questionRepository = questionRepository ?? throw new ArgumentNullException(nameof(questionRepository));
         private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-        public async Task<GetQuestionsListQueryResponse> Handle(GetQuestionsListQuery request, CancellationToken cancellationToken)
+        public async Task<BaseResponse<List<QuestionListVm>>> Handle(GetQuestionsListQuery request, CancellationToken cancellationToken)
         {
-            var response = new GetQuestionsListQueryResponse();
+            var validator = new GetQuestionListQueryValidator();
+            var validationResult = await validator.ValidateAsync(request);
 
-            var validationResponse = await RequestValidationHandler.ValidateAsync<GetQuestionsListQuery>(
-                request,
-                new GetQuestionListQueryValidator(),
-                () => response,
-                cancellationToken
-            );
+            if (validationResult.Errors.Count() > 0)
+            {
+                return new BaseResponse<List<QuestionListVm>>(
+                    "There is validation Errors",
+                    false,
+                    400,
+                    validationResult.Errors.Select(e=>e.ErrorMessage).ToList());
+            }
 
-            if (validationResponse is not null)
-                return (GetQuestionsListQueryResponse)validationResponse;
+            var questions = request.QuestionBankId.HasValue 
+             ? await _questionRepository.ListAllAsync (q => q.QuestionBankId == request.QuestionBankId.Value)
+             : await _questionRepository.ListAllAsync (q => q.ExamId == request.ExamId!.Value);
 
-            IReadOnlyList<Question> questions =
-             request.QuestionBankId.HasValue ?
-             await _questionRepository.ListAllAsync
-             (q => q.QuestionBankId == request.QuestionBankId.Value, cancellationToken) :
+            var questionDetailVmList = _mapper.Map<List<QuestionListVm>>(questions);
 
-             await _questionRepository.ListAllAsync
-             (q => q.ExamId == request.ExamId.Value, cancellationToken);
-
-            if (questions.Count == 0)
-                throw new NotFoundException
-                    (nameof(Question), request.QuestionBankId ?? request.ExamId.Value);
-
-            var questionDetailVmList = _mapper.Map<ICollection<QuestionListVm>>(questions);
-
-            response.Questions = questionDetailVmList;
-            response.Success = true;
-            response.Message = "Questions retrieved successfully.";
-
-            return response;
+            return new BaseResponse<List<QuestionListVm>>("", true, 200, questionDetailVmList);
         }
     }
 }
