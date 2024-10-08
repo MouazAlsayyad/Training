@@ -15,7 +15,7 @@ namespace Training.Persistence
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddScoped(typeof(IAsyncRepository<>), typeof(BaseRepository<>));
-
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IOptionRepository, OptionRepository>();
             services.AddScoped<IQuestionRepository, QuestionRepository>();
             services.AddScoped<IQuestionBankRepository, QuestionBankRepository>();

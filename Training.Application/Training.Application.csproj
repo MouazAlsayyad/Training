@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Authentication\Login\" />
     <Folder Include="Features\Authentication\Logout\" />
     <Folder Include="Features\Courses\Queries\" />
     <Folder Include="Features\Users\Queries\" />

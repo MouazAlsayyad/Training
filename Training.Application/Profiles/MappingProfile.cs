@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Training.Application.Features.Authentication.Login;
 using Training.Application.Features.Options.Commands.CreateOption;
 using Training.Application.Features.Options.Commands.UpdateOption;
 using Training.Application.Features.Options.Queries.GetOptionById;
@@ -15,6 +16,7 @@ namespace Training.Application.Profiles
     {
         public MappingProfile()
         {
+            CreateMap<User, LoginCommand>().ReverseMap();
             //---------------------------------- Question ----------------------------------
             CreateMap<Question, GetQuestionsListQuery>().ReverseMap();
             CreateMap<Question, GetQuestionDetailQuery>().ReverseMap();
